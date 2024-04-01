@@ -1,7 +1,7 @@
 const { response, request } = require('express')
 const bcryptjs = require('bcryptjs')
 const Usuario = require('../models/user')
-const { codeGenerate } = require('../helpers/CodeGenerate')
+const { codeGenerate } = require('../helpers/codeGenerate')
 const { verificarUnicidad } = require('../helpers/verificarUnicidad')
 
  
