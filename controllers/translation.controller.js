@@ -37,9 +37,8 @@ const translationPOST = async(req, res = response) => {
 
 const getCompanies = async(req, res = response) => {
   const { type } = req.params; 
-
+  
   const companies = await Usuario.find( { role: "COMPANY", type_company: type }, { uid: 1, code: 1, name: 1, type_company: 1  } );
-
   res.json({ companies });
 };
 
@@ -50,7 +49,6 @@ const getMyRequest = async(req, res = response) => {
   
   const turistPending = await Translation.find( { code: user.code, state: "PENDING" } );
   const count = turistPending.length;
-
 
   res.json( { 
     turistPending,
