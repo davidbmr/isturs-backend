@@ -35,6 +35,7 @@ const translationPOST = async(req, res = response) => {
 }
 
 
+
 const getCompanies = async(req, res = response) => {
   const { type } = req.params; 
   

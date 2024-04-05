@@ -14,7 +14,7 @@ const userGET = async(req = request, res = response) => {
 
 const getByCode = async(req, res = response) => {
   const code = req.params.code;
-  const users = await Usuario.find( {  code: code } );
+  const users = await Usuario.find( {  code: code, role: "COMPANY" } );
 
   res.json({
     users
