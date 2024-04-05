@@ -1,6 +1,6 @@
 const { Router } = require('express')
 const { check } = require('express-validator')
-const { userGET, userPOST, userPUT } = require('../controllers/user.controller')
+const { userGET, userPOST, userPUT, getByCode, getById, getMyTransfers } = require('../controllers/user.controller')
 const { validarCampos } = require('../middlewares/validar-campos')
 const { validateRole, emailExist, userExist, phoneExist, rucExist, codeExist } = require('../helpers/db-validators')
 const { validarJWT } = require('../middlewares/validar-jwt')
@@ -14,7 +14,7 @@ router.get('/',[
 
 router.post('/',[
   check('name', 'El campo "name" es obligatorio').not().isEmpty(),
-  check('password', 'El campo "password" debe ser mayor a 6 caracteres').isLength( { min: 8 } ),
+  check('password', 'El campo "password" debe ser mayor a 6 caracteres').isLength( { min: 6 } ),
   check('email', 'El campo "email" no es válido').custom( emailExist ),
   check('role', 'El campo "role" es obligatorio').not().isEmpty(),
   check('role', 'No es un rol permitido').custom( validateRole ),
@@ -32,6 +32,24 @@ router.put('/:id',[
   check('id', 'No es un ID válido').isMongoId(),
   validarCampos
 ], userPUT)
+
+router.get('/getByCode/:code',[
+  validarJWT,
+  check('code', 'El campo "code" es obligatorio').not().isEmpty(),
+  validarCampos
+], getByCode)
+
+router.get('/getById/:id',[
+  validarJWT,
+  check('id', 'El campo "id" es obligatorio').not().isEmpty(),
+  validarCampos
+], getById)
+
+router.get('/getMyTransfers',[
+  validarJWT,
+  validarCampos
+], getMyTransfers)
+
 
 
 

@@ -3,18 +3,47 @@ const bcryptjs = require('bcryptjs')
 const Usuario = require('../models/user')
 const { codeGenerate } = require('../helpers/codeGenerate')
 const { verificarUnicidad } = require('../helpers/verificarUnicidad')
+const { findUser } = require('../helpers/findUser')
 
  
 const userGET = async(req = request, res = response) => {
-
-
-  const { limit = 5, from = 0} = req.query
   const usuarios = await Usuario.find()
-    .skip(Number( from ))
-    .limit(Number( limit ))
-
 
   res.json({ usuarios })
+}
+
+const getByCode = async(req, res = response) => {
+  const code = req.params.code;
+  const users = await Usuario.find( {  code: code } );
+
+  res.json({
+    users
+  });
+};
+
+const getMyTransfers= async(req, res = response) => {
+  const JWT = req.headers.access_token
+  const user = await findUser(JWT)
+
+  const users = await Usuario.find( {  code: user.code, role: "OPERATOR" } );
+  const count = users.length
+
+  res.json({
+    users,
+    count
+  });
+
+};
+
+
+const getById = async(req = request, res = response) => {
+  const id = req.params.id
+
+  console.log(id)
+
+  const usuarios = await Usuario.find({ _id: id });
+
+  res.json({ usuarios });
 }
 
 const userPOST = async(req, res = response) => {
@@ -160,5 +189,8 @@ const userPUT = async(req, res = response) => {
 module.exports = {
   userGET,
   userPOST,
-  userPUT
+  userPUT,
+  getByCode,
+  getById,
+  getMyTransfers
 }
