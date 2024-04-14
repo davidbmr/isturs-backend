@@ -110,11 +110,36 @@ const getMyTranslations = async(req, res = response) => {
 
 };
 
+const editTranslation = async(req, res = response) => {
+  let { id_translation, chart, operator_IMG, turist_IMG } = req.body
+
+  const datosActualizados = {
+    ...(chart && {chart}),
+    ...(operator_IMG && {operator_IMG}),
+    ...(turist_IMG && {turist_IMG}),
+  };
+
+  try {
+    const translate = await Translation.findByIdAndUpdate(id_translation, datosActualizados, { new: true });
+    res.json(translate);
+  } catch (error) {
+    res.status(500).json({
+      msg: 'Error al actualizar Traslado',
+      error
+    });
+  }
+
+ 
+}
+
+
+
 
 module.exports = {
   translationPOST,
   getCompanies,
   getMyRequest,
   acceptTourist,
-  getMyTranslations
+  getMyTranslations,
+  editTranslation
 }
