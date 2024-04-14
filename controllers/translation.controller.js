@@ -16,7 +16,8 @@ const translationPOST = async(req, res = response) => {
     code,
     chart: user.name,
     create_at: hourGenerate(),
-    turist_name: user.name
+    turist_name: user.name,
+    turist_id: user._id
   }
 
   try {
@@ -32,6 +33,43 @@ const translationPOST = async(req, res = response) => {
       msg: 'Error de Servidor'
     })
   }
+}
+
+const acceptTourist = async(req, res = response) => {
+
+  const { turist_id, transfer_id, origin, destination, date, hour, id_translation } = req.body
+
+  const turistValidation = await Usuario.find( { _id: turist_id, role: "TURIST" } );
+  const transferValidation = await Usuario.find( { _id: transfer_id, role: "OPERATOR" } );
+
+  if( !turistValidation || !transferValidation ) {
+    return res.status(400).json({
+      msg: 'El Turista o el Trasladista no existen'
+    })
+  }
+
+  const data = {
+    turist_id,
+    transfer_id,
+    origin, 
+    destination,
+    date,
+    hour,
+    state: "PROCESS"
+  }
+
+  try {
+    const translation = await Translation.findByIdAndUpdate(id_translation, data, { new: true });
+    res.json(translation);
+    
+  } catch (error) {
+    res.status(500).json({
+      msg: 'Error al actualizar usuario',
+      error
+    });
+  }
+
+
 }
 
 
@@ -58,9 +96,25 @@ const getMyRequest = async(req, res = response) => {
 
 };
 
+const getMyTranslations = async(req, res = response) => {
+  const JWT = req.headers.access_token
+  const user = await findUser(JWT)
+  
+  const translations = await Translation.find( { transfer_id: user._id, state: "PROCESS" } );
+  const count = translations.length;
+
+  res.json( { 
+    translations,
+    count 
+  } );
+
+};
+
 
 module.exports = {
   translationPOST,
   getCompanies,
-  getMyRequest
+  getMyRequest,
+  acceptTourist,
+  getMyTranslations
 }
