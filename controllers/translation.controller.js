@@ -127,8 +127,21 @@ const editTranslation = async(req, res = response) => {
     });
   }
 
- 
 }
+
+const getMyHistory = async(req, res = response) => {
+  const JWT = req.headers.access_token
+  const user = await findUser(JWT)
+  
+  const history = await Translation.find( { code: user.code } );
+  const count = history.length;
+
+  res.json( { 
+    history,
+    count 
+  } );
+
+};
 
 
 
@@ -139,5 +152,6 @@ module.exports = {
   getMyRequest,
   acceptTourist,
   getMyTranslations,
-  editTranslation
+  editTranslation,
+  getMyHistory
 }
