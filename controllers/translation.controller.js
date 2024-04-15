@@ -5,7 +5,6 @@ const Translation = require('../models/translation')
 const Usuario = require('../models/user')
 
 
-
 const translationPOST = async(req, res = response) => {
   
   const { code } = req.body
@@ -35,12 +34,11 @@ const translationPOST = async(req, res = response) => {
 }
 
 
-
 const getCompanies = async(req, res = response) => {
   const { type } = req.params; 
   
   const companies = await Usuario.find( { role: "COMPANY", type_company: type }, { uid: 1, code: 1, name: 1, type_company: 1  } );
-  res.json({ companies });
+  res.json( { companies } );
 };
 
 
