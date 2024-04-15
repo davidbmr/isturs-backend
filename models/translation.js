@@ -37,10 +37,16 @@ const TraslationSchema = Schema({
   destination: {
     type: String
   },
-  destination: {
+  transfer_id: {
     type: String
   },
-  transfer_id: {
+  turist_id: {
+    type: String
+  },
+  date: {
+    type: String
+  },
+  hour: {
     type: String
   }
 })
