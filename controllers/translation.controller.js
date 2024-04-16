@@ -1,4 +1,3 @@
-const { codeExist } = require('../helpers/db-validators')
 const { findUser } = require('../helpers/findUser')
 const { hourGenerate } = require('../helpers/hourGenerate')
 const Translation = require('../models/translation')
@@ -94,18 +93,53 @@ const getMyRequest = async(req, res = response) => {
 
 };
 
-const getMyTranslations = async(req, res = response) => {
-  const JWT = req.headers.access_token
-  const user = await findUser(JWT)
-  
-  const translations = await Translation.find( { transfer_id: user._id, state: "PROCESS" } );
-  const count = translations.length;
+const getMyTranslations = async(req, res) => {
+  const JWT = req.headers.access_token;
+  const user = await findUser(JWT);
 
-  res.json( { 
-    translations,
-    count 
-  } );
+  if (user) {
+    const query = user.role === "OPERATOR" ?
+                  { transfer_id: user._id, state: "PROCESS" } :
+                  { turist_id: user._id, state: "PROCESS" };
 
+    const translations = await Translation.find(query);
+
+    // Convertir la fecha actual en un objeto Date
+    const now = new Date();
+    
+    // Función para convertir la fecha del traslado a un objeto Date
+    const parseDate = (dateStr, hourStr) => {
+      const [day, month, year] = dateStr.split('/');
+      const date = new Date(`${month}/${day}/${year} ${hourStr}:00`);
+      return date;
+    };
+
+    // Encontrar el traslado más cercano que aún no ha ocurrido
+    let closestTranslation = null;
+    let minDiff = Infinity;
+    translations.forEach(translation => {
+      const translationDate = parseDate(translation.date, translation.hour);
+      const diff = translationDate - now;
+      if (diff > 0 && diff < minDiff) {
+        closestTranslation = translation;
+        minDiff = diff;
+      }
+    });
+
+    // Agregar el campo `enCurso` al traslado más cercano
+    const updatedTranslations = translations.map(translation => {
+      const isClosest = translation === closestTranslation;
+      return { ...translation._doc, enCurso: isClosest };
+    });
+
+    res.json({
+      translations: updatedTranslations,
+      count: updatedTranslations.length
+    });
+
+  } else {
+    res.status(404).send('User not found');
+  }
 };
 
 const editTranslation = async(req, res = response) => {

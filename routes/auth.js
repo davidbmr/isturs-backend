@@ -1,6 +1,6 @@
 const { Router } = require('express')
 const { check } = require('express-validator')
-const { login } = require('../controllers/auth.controller')
+const { login, refreshToken } = require('../controllers/auth.controller')
 const { validarCampos } = require('../middlewares/validar-campos')
 
 
@@ -11,6 +11,12 @@ router.post('/login', [
   check('password', 'La contraseña es obligatoria').not().isEmpty(),
   validarCampos
 ], login )
+
+router.post('/refreshToken', [
+  check('token', 'El username es obligatorio').not().isEmpty(),
+  validarCampos
+], refreshToken )
+
 
 
 
