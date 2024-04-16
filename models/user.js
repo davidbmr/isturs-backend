@@ -43,6 +43,9 @@ const UsuarioSchema = Schema({
     type: String,
     required: true,
     enum: ['TURIST', 'OPERATOR', 'COMPANY']
+  },
+  profile_img: {
+    type: String,
   }
 })
 

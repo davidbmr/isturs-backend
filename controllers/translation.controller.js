@@ -15,8 +15,11 @@ const translationPOST = async(req, res = response) => {
     chart: user.name,
     create_at: hourGenerate(),
     turist_name: user.name,
-    turist_id: user._id
+    turist_id: user._id,
+    turist_IMG: user.profile_img
   }
+
+  console.log(data)
 
   try {
 
@@ -53,7 +56,8 @@ const acceptTourist = async(req, res = response) => {
     destination,
     date,
     hour,
-    state: "PROCESS"
+    state: "PROCESS",
+    operator_IMG: transferValidation.profile_img
   }
 
   try {

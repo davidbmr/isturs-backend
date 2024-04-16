@@ -10,6 +10,8 @@ class Server {
     this.usuarioPath      = '/api/user'
     this.authPath         = '/api/auth'
     this.translationPath  = '/api/translation'
+    this.upholdPath       = '/api/uphold'
+
 
 
 
@@ -49,6 +51,7 @@ class Server {
     this.app.use(this.authPath, require('../routes/auth'))
     this.app.use(this.usuarioPath, require('../routes/user'))
     this.app.use(this.translationPath, require('../routes/translation'))
+    this.app.use(this.upholdPath, require('../routes/uphold'))
   }
 
   listen() {
