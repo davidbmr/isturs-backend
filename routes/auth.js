@@ -13,7 +13,7 @@ router.post('/login', [
 ], login )
 
 router.post('/refreshToken', [
-  check('token', 'El username es obligatorio').not().isEmpty(),
+  check('token', 'El token es obligatorio').not().isEmpty(),
   validarCampos
 ], refreshToken )
 

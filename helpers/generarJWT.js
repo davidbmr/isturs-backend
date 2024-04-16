@@ -24,7 +24,7 @@ const generarJWT = ( uid = '' ) => {
 
 const verificarJWT = (token) => {
   return new Promise((resolve, reject) => {
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.SECRETORPRIVATEKEY, (err, decoded) => {
       if (err) {
         reject('Token no válido');
       } else {

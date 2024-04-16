@@ -8,7 +8,8 @@ const {
   acceptTourist, 
   getMyTranslations, 
   editTranslation,
-  getMyHistory } = require('../controllers/translation.controller')
+  getMyHistory, 
+  getMyTuristProcess} = require('../controllers/translation.controller')
 const { codeExist } = require('../helpers/db-validators')
 const { validarJWT } = require('../middlewares/validar-jwt')
 
@@ -43,6 +44,12 @@ router.get('/myTranslations',[
   validarJWT,
   validarCampos
 ], getMyTranslations)
+
+router.get('/getMyTuristProcess',[
+  validarJWT,
+  validarCampos
+], getMyTuristProcess)
+
 
 router.post('/acceptTourist', [
   validarJWT,

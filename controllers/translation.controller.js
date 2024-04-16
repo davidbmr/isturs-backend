@@ -177,7 +177,19 @@ const getMyHistory = async(req, res = response) => {
 
 };
 
+const getMyTuristProcess = async(req, res = response) => {
+  const JWT = req.headers.access_token
+  const user = await findUser(JWT)
+  
+  const turistProgress = await Translation.find( { code: user.code, state: "PROCESS" } );
+  const count = turistProgress.length;
 
+  res.json( { 
+    turistProgress,
+    count 
+  } );
+
+};
 
 
 module.exports = {
@@ -187,5 +199,6 @@ module.exports = {
   acceptTourist,
   getMyTranslations,
   editTranslation,
-  getMyHistory
+  getMyHistory,
+  getMyTuristProcess
 }
