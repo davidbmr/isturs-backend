@@ -19,6 +19,12 @@ const messageSchema = new Schema({
   }, 
   user_id: {
     type: String,
+  },
+  user_role: {
+    type: String,
+  },
+  user_img: {
+    type: String,
   }
 });
 

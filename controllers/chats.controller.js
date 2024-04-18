@@ -30,8 +30,11 @@ const createMessage = async (req, res) => {
       message: text,
       user_id: user._id,
       user_name: user.name,
-      user_img: user.profile_img
+      user_img: user.profile_img,
+      user_role: user.role
     });
+
+    console.log(message)
 
     await message.save();
     res.status(201).json(message);

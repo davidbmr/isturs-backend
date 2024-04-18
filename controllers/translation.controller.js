@@ -202,6 +202,16 @@ const getMyTuristProcess = async(req, res = response) => {
 
 };
 
+const getMyTranslate = async(req, res = response) => {
+  const { id } = req.params;
+  const turistProgress = await Translation.find( { _id: id  } );
+ 
+  res.json( { 
+    turistProgress
+  } );
+
+};
+
 
 module.exports = {
   translationPOST,
@@ -211,5 +221,6 @@ module.exports = {
   getMyTranslations,
   editTranslation,
   getMyHistory,
-  getMyTuristProcess
+  getMyTuristProcess,
+  getMyTranslate
 }
