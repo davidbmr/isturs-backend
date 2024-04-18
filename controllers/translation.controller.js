@@ -20,8 +20,6 @@ const translationPOST = async(req, res = response) => {
     turist_IMG: user.profile_img
   }
 
-  console.log(data)
-
   try {
 
     const translation = await new Translation( data )

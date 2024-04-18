@@ -11,8 +11,6 @@ const upholdImage = async(req, res = response) => {
   try {
     const { image } = req.body; 
 
-    console.log(image)
-
     // Opción con async/await
     const result = await cloudinary.uploader.upload(image, {
       folder: "profile" 
@@ -27,38 +25,31 @@ const upholdImage = async(req, res = response) => {
   }
 
 };
-
 const editUpholdImage = async(req, res = response) => {
-  const JWT = req.headers.access_token
-  const user = await findUser(JWT)
+  const JWT = req.headers.access_token;
+  const user = await findUser(JWT);
   
   try {
-    const { image, id_translation } = req.body; 
+    const { image, id_translation } = req.body;
 
-    // Opción con async/await
     const result = await cloudinary.uploader.upload(image, {
       folder: "profile" 
     });
 
-    
-    if(user.role === "TURIST"){
+    if (user.role === "TURIST") {
       const imgTranslate = await Translation.findByIdAndUpdate(id_translation, { turist_IMG: result.url }, { new: true });
-      res.json(imgTranslate);
-
-    }
-
-    if(user.role === "OPERATOR"){
+      return res.json(imgTranslate);  // Agrega return para evitar ejecución posterior
+    } else if (user.role === "OPERATOR") {
       const imgTranslate = await Translation.findByIdAndUpdate(id_translation, { operator_IMG: result.url }, { new: true });
-      res.json(imgTranslate);
+      return res.json(imgTranslate);  // Agrega return para evitar ejecución posterior
     }
 
-    res.status(400).send({ message: 'ROL inválido', error });
-
+    return res.status(400).send({ message: 'ROL inválido' });  // Usa return aquí también
 
   } catch (error) {
-    res.status(500).send({ message: 'Error al subir la imagen', error });
+    console.error(error);  // Mejor manejo de logging
+    return res.status(500).send({ message: 'Error al subir la imagen', error: error.toString() });  // Usa error.toString() para una mejor descripción del error
   }
-
 };
 
 module.exports = {
