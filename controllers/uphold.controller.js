@@ -35,8 +35,6 @@ const editUpholdImage = async(req, res = response) => {
   try {
     const { image, id_translation } = req.body; 
 
-    console.log(image)
-
     // Opción con async/await
     const result = await cloudinary.uploader.upload(image, {
       folder: "profile" 

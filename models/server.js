@@ -1,38 +1,45 @@
-const express = require('express')
-const cors = require('cors')
-const { dbConnection } = require('../database/config')
+const express = require('express');
+const cors = require('cors');
+const http = require('http');
+const { Server: IOServer } = require('socket.io');
+const { dbConnection } = require('../database/config');
 
 class Server {
-
   constructor() {
-    this.app              = express()
-    this.port             = process.env.PORT
-    this.usuarioPath      = '/api/user'
-    this.authPath         = '/api/auth'
-    this.translationPath  = '/api/translation'
-    this.upholdPath       = '/api/uphold'
+    this.app = express();
+    this.port = process.env.PORT;
 
+    // Paths para tus rutas
+    this.paths = {
+      auth: '/api/auth',
+      user: '/api/user',
+      translation: '/api/translation',
+      uphold: '/api/uphold',
+      chats: '/api/chats',
+    };
 
+    // Conectar a base de datos
+    this.conectarDB();
 
+    // Middlewares
+    this.middlewares();
 
-    //Conectar a base de datos
-    this.conectarDB()
+    // Rutas de la app
+    this.routes();
 
-    //Middlewares
-    this.middlewares()
+    // Crear servidor HTTP basado en la instancia de Express
+    this.server = http.createServer(this.app);
 
-
-    //Rutas de la app
-    this.routes()
-
+    // Configuración de Socket.io
+    this.io = new IOServer(this.server);
+    this.sockets();
   }
 
   async conectarDB() {
-    await dbConnection()
+    await dbConnection();
   }
 
   middlewares() {
-    //Aplicación del CORS
     this.app.use(cors({
       origin: '*',
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
@@ -40,25 +47,34 @@ class Server {
       credentials: false
     }));
 
-    //Lectura y parseo del body
     this.app.use(express.json());
-
-    //Directorio Publico
     this.app.use(express.static('public'));
   }
 
   routes() {
-    this.app.use(this.authPath, require('../routes/auth'))
-    this.app.use(this.usuarioPath, require('../routes/user'))
-    this.app.use(this.translationPath, require('../routes/translation'))
-    this.app.use(this.upholdPath, require('../routes/uphold'))
+    this.app.use(this.paths.auth, require('../routes/auth'));
+    this.app.use(this.paths.user, require('../routes/user'));
+    this.app.use(this.paths.translation, require('../routes/translation'));
+    this.app.use(this.paths.uphold, require('../routes/uphold'));
+    this.app.use(this.paths.chats, require('../routes/chats'));
+  }
+
+  sockets() {
+    this.io.on('connection', (socket) => {
+      console.log('Nuevo cliente conectado', socket.id);
+
+      socket.on('disconnect', () => {
+        console.log('Cliente desconectado');
+      });
+
+    });
   }
 
   listen() {
-    this.app.listen(this.port, () => {
-      console.log(`Example app listening on port ${this.port}`)
-    })
+    this.server.listen(this.port, () => {
+      console.log(`Servidor corriendo en puerto ${this.port}`);
+    });
   }
 }
 
-module.exports = Server
+module.exports = Server;

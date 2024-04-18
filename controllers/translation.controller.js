@@ -2,6 +2,7 @@ const { findUser } = require('../helpers/findUser')
 const { hourGenerate } = require('../helpers/hourGenerate')
 const Translation = require('../models/translation')
 const Usuario = require('../models/user')
+const Chat = require('../models/chats');
 
 
 const translationPOST = async(req, res = response) => {
@@ -36,43 +37,49 @@ const translationPOST = async(req, res = response) => {
   }
 }
 
-const acceptTourist = async(req, res = response) => {
+const acceptTourist = async (req, res) => {
+  const { turist_id, transfer_id, origin, destination, date, hour, id_translation } = req.body;
 
-  const { turist_id, transfer_id, origin, destination, date, hour, id_translation } = req.body
+  // Validar la existencia de turista y trasladista
+  const turistValidation = await Usuario.findOne({ _id: turist_id, role: "TURIST" });
+  const transferValidation = await Usuario.findOne({ _id: transfer_id, role: "OPERATOR" });
 
-  const turistValidation = await Usuario.find( { _id: turist_id, role: "TURIST" } );
-  const transferValidation = await Usuario.find( { _id: transfer_id, role: "OPERATOR" } );
-
-  if( !turistValidation || !transferValidation ) {
+  if (!turistValidation || !transferValidation) {
     return res.status(400).json({
       msg: 'El Turista o el Trasladista no existen'
-    })
-  }
-
-  const data = {
-    turist_id,
-    transfer_id,
-    origin, 
-    destination,
-    date,
-    hour,
-    state: "PROCESS",
-    operator_IMG: transferValidation.profile_img
-  }
-
-  try {
-    const translation = await Translation.findByIdAndUpdate(id_translation, data, { new: true });
-    res.json(translation);
-    
-  } catch (error) {
-    res.status(500).json({
-      msg: 'Error al actualizar usuario',
-      error
     });
   }
 
+  try {
+    // Crear un nuevo chat para este traslado
+    const newChat = new Chat({
+      turist_id,
+      transfer_id
+    });
+    const savedChat = await newChat.save();
 
-}
+    // Actualizar el traslado con el ID del nuevo chat
+    const data = {
+      turist_id,
+      transfer_id,
+      origin,
+      destination,
+      date,
+      hour,
+      state: "PROCESS",
+      operator_IMG: transferValidation.profile_img,
+      chat_Id: savedChat._id // Asignar el ID del chat creado al traslado
+    };
+
+    const translation = await Translation.findByIdAndUpdate(id_translation, data, { new: true });
+    res.json(translation);
+  } catch (error) {
+    res.status(500).json({
+      msg: 'Error al procesar la solicitud',
+      error
+    });
+  }
+};
 
 
 const getCompanies = async(req, res = response) => {
