@@ -43,6 +43,7 @@ const acceptTourist = async (req, res) => {
   // Validar la existencia de turista y trasladista
   const turistValidation = await Usuario.findOne({ _id: turist_id, role: "TURIST" });
   const transferValidation = await Usuario.findOne({ _id: transfer_id, role: "OPERATOR" });
+  
 
   if (!turistValidation || !transferValidation) {
     return res.status(400).json({
@@ -71,7 +72,11 @@ const acceptTourist = async (req, res) => {
       chat_Id: savedChat._id // Asignar el ID del chat creado al traslado
     };
 
+    console.log(data)
+
+
     const translation = await Translation.findByIdAndUpdate(id_translation, data, { new: true });
+   
     res.json(translation);
   } catch (error) {
     res.status(500).json({
@@ -160,6 +165,7 @@ const editTranslation = async(req, res = response) => {
     ...(chart && {chart}),
     ...(operator_IMG && {operator_IMG}),
     ...(turist_IMG && {turist_IMG}),
+    ...(operator_IMG && {operator_IMG}),
   };
 
   try {

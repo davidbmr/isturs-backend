@@ -185,7 +185,6 @@ const userPUT = async(req, res = response) => {
 
 }
 
-
 module.exports = {
   userGET,
   userPOST,
