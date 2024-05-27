@@ -35,6 +35,32 @@ const translationPOST = async(req, res = response) => {
   }
 }
 
+const finishTranslate = async (req, res = response) => {
+  const { id_translation } = req.body;
+
+  try {
+    // Actualizar el estado del traslado a "RESOLVED"
+    const updatedTranslation = await Translation.findByIdAndUpdate(
+      id_translation,
+      { state: "RESOLVED" },
+      { new: true }
+    );
+
+    if (!updatedTranslation) {
+      return res.status(404).json({
+        msg: 'Traslado no encontrado'
+      });
+    }
+
+    res.json(updatedTranslation);
+  } catch (error) {
+    res.status(500).json({
+      msg: 'Error al actualizar el estado del traslado',
+      error
+    });
+  }
+};
+
 const acceptTourist = async (req, res) => {
   const { turist_id, transfer_id, origin, destination, date, hour, id_translation } = req.body;
 
@@ -91,7 +117,6 @@ const getCompanies = async(req, res = response) => {
   const companies = await Usuario.find( { role: "COMPANY", type_company: type }, { uid: 1, code: 1, name: 1, type_company: 1  } );
   res.json( { companies } );
 };
-
 
 const getMyRequest = async(req, res = response) => {
   const JWT = req.headers.access_token
@@ -226,5 +251,6 @@ module.exports = {
   editTranslation,
   getMyHistory,
   getMyTuristProcess,
-  getMyTranslate
+  getMyTranslate,
+  finishTranslate
 }
